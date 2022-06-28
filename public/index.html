@@ -25,16 +25,58 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
         <title>React App</title>
-        <script>
-            const ws = new WebSocket('ws://localhost:8082');
-            ws.addEventListener('open', () => {
-                console.log('we are connected!');
-            });
-        </script>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="root"></div>
+        <form>
+            <input id='text-input' value="" type='text' placeholder="typing...">
+        </form>
+        <!-- <button type='button' id='send-button' onclick="getValueInput()">send</button> -->
+        <div id="message"></div> 
+        <script>
+            // let inputValue = document.getElementById("text-input").value; 
+            // console.log(document.getElementById("text-input"))
+            // console.log(inputValue)
+            
+            // const getValueInput = () =>{
+            //     let inputValue = document.getElementById("text-input").value; 
+
+            //     document.getElementById("valueInput").innerHTML = inputValue; 
+            //     const ws = new WebSocket('ws://localhost:8085');
+            //     ws.addEventListener('open', () => {
+            //         console.log('we are connected!');
+            //         ws.send(inputValue);
+            //     });
+            //     ws.addEventListener('message', ({data}) => {
+            //         console.log(data)
+            //     })
+                
+            // }
+            // const ws = new WebSocket('ws://localhost:8085');            
+            // var button = document.querySelector('button').value;
+
+            function showMessage(text, isMine = false) {
+                document.getElementById('message').innerHTML += `
+                    <div class='message-row' ${isMine ? 'mine': 'theirs'}>
+                        <div class='bubble'>${text}</div>
+                    </div>
+                `;
+            }
+            const ws = new WebSocket('ws://localhost:8085');
+            ws.addEventListener('message', ev => {
+                console.log(ev.data.text());
+                ev.data.text().then(showMessage);
+            })
+            document.querySelector('form').onsubmit = ev => {
+                ev.preventDefault();
+                const input = document.querySelector('input');
+                ws.send(input.value);
+                showMessage(input.value, true);
+                input.value = ''
+            }
+
+        </script>
         <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
